@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #define MAX 80 // max line chars
 
@@ -26,17 +28,27 @@ int main(void)
         { // Check if strtok found a token
             if (token == ls)
             {
-                // supposed to act as the full ls command in regular bash window
+                if (strtok(NULL, " ") != NULL)
+                {
+                    char token_second = strtok(NULL, " "); // supposed to act as the full ls command in regular bash window
+                    char system_command = "ls" + token_second;
+                    system(system_command);
+                }
             }
             else if (token == cd)
             {
-                // supposed to act as the full cd command in regular bash window
-                for (i = 3; i < (strlen(cmd) - 4); i++)
-                { // supposed to change the working directory in console from fbash> to per example fbash/Desktop> and whatnot
-                    bg_stat[counter] = cmd[i];
-                    *last = strlen(bg_stat);
+                if (strtok(NULL, " ") != NULL)
+                {
+                    char token_second = strtok(NULL, " ");
+                    char directory = "/" + token_second;
+                    chdir(directory); // supposed to act as the full cd command in regular bash window
+                    for (i = 3; i < (strlen(cmd) - 4); i++)
+                    { // supposed to change the working directory in console from fbash> to per example fbash/Desktop> and whatnot
+                        bg_stat[counter] = cmd[i];
+                        *last = strlen(bg_stat);
+                    }
+                    bg_stat[last] = ">";
                 }
-                bg_stat[last] = ">";
             }
         }
         else

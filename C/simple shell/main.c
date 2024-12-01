@@ -5,53 +5,88 @@
 
 #define MAX 80 // max line chars
 
-int main(void) {
+int main(void)
+{
     int state = 1; // active state changes to 0 when user types exit
     int len;
-    char cmd[MAX]; // max chars of command
+    char cmd[MAX];                  // max chars of command
     char bg_stat[MAX] = "fbash/> "; // prompt message
 
-    while (state) {
-        printf("%s", bg_stat); // Print the prompt
+    while (state)
+    {
+        printf("%s", bg_stat);  // Print the prompt
         fgets(cmd, MAX, stdin); // Read user input
         len = strlen(cmd);
-        
+
         // Remove the newline character from the input
-        if (len > 0 && cmd[len - 1] == '\n') {
+        if (len > 0 && cmd[len - 1] == '\n')
+        {
             cmd[len - 1] = '\0';
         }
 
         char *token = strtok(cmd, " "); // Get the first token
-        if (token != NULL) { // Check if strtok found a token
-            if (strcmp(token, "ls") == 0) { // Use strcmp for string comparison
+        if (token != NULL)
+        { // Check if strtok found a token
+            switch (hash(token))
+            {
+            case 1: // ls
+            {
                 char *token_second = strtok(NULL, " "); // Get the second token
-                if (token_second != NULL) {
+                if (token_second != NULL)
+                {
                     char system_command[MAX]; // Buffer for the command
                     snprintf(system_command, sizeof(system_command), "ls %s", token_second);
                     system(system_command); // Execute the command
-                } else {
+                }
+                else
+                {
                     system("ls"); // If no argument, just run ls
                 }
-            } else if (strcmp(token, "cd") == 0) { // Use strcmp for string comparison
+            }
+            break;
+            case 2: // cd
+            {
                 char *token_second = strtok(NULL, " "); // Get the second token
-                if (token_second != NULL) {
-                    if (chdir(token_second) != 0) { // Change directory and check for errors
+                if (token_second != NULL)
+                {
+                    if (chdir(token_second) != 0)
+                    {                        // Change directory and check for errors
                         perror("cd failed"); // Print error message
-                    } else {
+                    }
+                    else
+                    {
                         // Update the prompt to reflect the new directory
                         snprintf(bg_stat, sizeof(bg_stat), "fbash/%s/> ", token_second);
                     }
-                } else {
+                }
+                else
+                {
                     printf("cd: missing argument\n"); // Handle missing argument
                 }
-            } else if (strcmp(token, "exit") == 0) {
+            }
+            break;
+            case 3:        // exit
                 state = 0; // Exit the loop
-            } else {
+                break;
+            default:
                 printf("Unknown command: %s\n", token); // Handle unknown commands
             }
-        } else {
+        }
+        else
+        {
             printf("Command field empty\n"); // Handle empty command
         }
     }
-    return 0; // Return success
+    return 0; // Return 0
+}
+
+int hash(char *token)
+{
+    if (strcmp(token, "ls") == 0)
+        return 1;
+    if (strcmp(token, "cd") == 0)
+        return 2;
+    if (strcmp(token, "exit") == 0)
+        return 3;
+    return 0;
 }

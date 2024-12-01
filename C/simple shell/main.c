@@ -7,53 +7,73 @@
 
 int main(void)
 {
-    int State = 1; // active state changes to 0 when user types exit
-    int i, len, index = 6, *counter = 6, *last;
-    char cmd[MAX], plus = 0; // max chars of command
-    char ls = "ls";
-    char cd = "cd";
-    char bg_stat = "fbash/> ";
-    while (State)
+    int state = 1; // active state changes to 0 when user types exit
+    int len;
+    char cmd[MAX];                  // max chars of command
+    char bg_stat[MAX] = "fbash/> "; // prompt message
+
+    while (state)
     {
-        printf("%c", bg_stat);
-        fgets(cmd, MAX, stdin);
+        printf("%s", bg_stat);  // Print the prompt
+        fgets(cmd, MAX, stdin); // Read user input
         len = strlen(cmd);
-        for (i = index; i < len - 1; i++)
+
+        // Remove the newline character from the input
+        if (len > 0 && cmd[len - 1] == '\n')
         {
-            cmd[i] = cmd[i + 1];
-            return cmd;
+            cmd[len - 1] = '\0';
         }
-        char *token = strtok(cmd, " ");
+
+        char *token = strtok(cmd, " "); // Get the first token
         if (token != NULL)
         { // Check if strtok found a token
-            if (token == ls)
-            {
-                if (strtok(NULL, " ") != NULL)
+            if (strcmp(token, "ls") == 0)
+            {                                           // Use strcmp for string comparison
+                char *token_second = strtok(NULL, " "); // Get the second token
+                if (token_second != NULL)
                 {
-                    char token_second = strtok(NULL, " "); // supposed to act as the full ls command in regular bash window
-                    char system_command = "ls" + token_second;
-                    system(system_command);
+                    char system_command[MAX]; // Buffer for the command
+                    snprintf(system_command, sizeof(system_command), "ls %s", token_second);
+                    system(system_command); // Execute the command
+                }
+                else
+                {
+                    system("ls"); // If no argument, just run ls
                 }
             }
-            else if (token == cd)
-            {
-                if (strtok(NULL, " ") != NULL)
+            else if (strcmp(token, "cd") == 0)
+            {                                           // Use strcmp for string comparison
+                char *token_second = strtok(NULL, " "); // Get the second token
+                if (token_second != NULL)
                 {
-                    char token_second = strtok(NULL, " ");
-                    char directory = "/" + token_second;
-                    chdir(directory); // supposed to act as the full cd command in regular bash window
-                    for (i = 3; i < (strlen(cmd) - 4); i++)
-                    { // supposed to change the working directory in console from fbash> to per example fbash/Desktop> and whatnot
-                        bg_stat[counter] = cmd[i];
-                        *last = strlen(bg_stat);
+                    if (chdir(token_second) != 0)
+                    {                        // Change directory and check for errors
+                        perror("cd failed"); // Print error message
                     }
-                    bg_stat[last] = ">";
+                    else
+                    {
+                        // Update the prompt to reflect the new directory
+                        snprintf(bg_stat, sizeof(bg_stat), "fbash/%s/> ", token_second);
+                    }
                 }
+                else
+                {
+                    printf("cd: missing argument\n"); // Handle missing argument
+                }
+            }
+            else if (strcmp(token, "exit") == 0)
+            {
+                state = 0; // Exit the loop
+            }
+            else
+            {
+                printf("Unknown command: %s\n", token); // Handle unknown commands
             }
         }
         else
         {
-            printf("command field empty\n");
+            printf("Command field empty\n"); // Handle empty command
         }
     }
+    return 0; // Return success
 }

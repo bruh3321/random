@@ -1,1 +1,1 @@
-currently not working if u can figure it out then hell yeah idfk
+it works now so far for the commands ls and cd

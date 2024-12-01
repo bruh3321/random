@@ -68,6 +68,8 @@ int main(void)
             case 3:        // exit
                 state = 0; // Exit the loop
                 break;
+            case 4:
+                system("pwd");
             default:
                 printf("Unknown command: %s\n", token); // Handle unknown commands
             }
@@ -80,7 +82,7 @@ int main(void)
     return 0; // Return 0
 }
 
-int hash(char *token)
+int hash(char *token) // some problems here i have to fix !!!!!
 {
     if (strcmp(token, "ls") == 0)
         return 1;
@@ -88,5 +90,7 @@ int hash(char *token)
         return 2;
     if (strcmp(token, "exit") == 0)
         return 3;
+    if (strcmp(token, "pwd") == 0)
+        return 4;
     return 0;
 }

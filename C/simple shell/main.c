@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "hashtoken.h"
 
 #define MAX 80 // max line chars
 
@@ -32,7 +33,8 @@ int main(void)
             case 1: // ls
             {
                 char *token_second = strtok(NULL, " "); // Get the second token
-                if (token_second != NULL)
+
+                                if (token_second != NULL)
                 {
                     char system_command[MAX]; // Buffer for the command
                     snprintf(system_command, sizeof(system_command), "ls %s", token_second);
@@ -70,6 +72,7 @@ int main(void)
                 break;
             case 4:
                 system("pwd");
+                break;
             default:
                 printf("Unknown command: %s\n", token); // Handle unknown commands
             }
@@ -80,17 +83,4 @@ int main(void)
         }
     }
     return 0; // Return 0
-}
-
-int hash(char *token) // some problems here i have to fix !!!!!
-{
-    if (strcmp(token, "ls") == 0)
-        return 1;
-    if (strcmp(token, "cd") == 0)
-        return 2;
-    if (strcmp(token, "exit") == 0)
-        return 3;
-    if (strcmp(token, "pwd") == 0)
-        return 4;
-    return 0;
 }

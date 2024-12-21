@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "hashtoken.h"
+#include "OSdetect.h"
 
 #define MAX 80 // max line chars
 
@@ -34,15 +35,40 @@ int main(void)
             {
                 char *token_second = strtok(NULL, " "); // Get the second token
 
-                                if (token_second != NULL)
+                if (token_second != NULL)
                 {
-                    char system_command[MAX]; // Buffer for the command
-                    snprintf(system_command, sizeof(system_command), "ls %s", token_second);
-                    system(system_command); // Execute the command
+                    switch (OSdetect())
+                    {
+                    case 1:                       // windows
+                        char system_command[MAX]; // Buffer for the command
+                        snprintf(system_command, sizeof(system_command), "dir %s", token_second);
+                        system(system_command); // Execute the command
+                        break;
+                    case 2:
+                        char system_command[MAX]; // Buffer for the command
+                        snprintf(system_command, sizeof(system_command), "ls %s", token_second);
+                        system(system_command); // Execute the command
+                        break;
+                    case 3:
+                        char system_command[MAX]; // Buffer for the command
+                        snprintf(system_command, sizeof(system_command), "ls %s", token_second);
+                        system(system_command); // Execute the command
+                    }
                 }
                 else
                 {
-                    system("ls"); // If no argument, just run ls
+                    switch (OSdetect())
+                    {
+                    case 1:
+                        system("dir"); // If no argument, just run dir
+                        break;
+                    case 2:
+                        system("ls"); // If no argument, just run ls
+                        break;
+                    case 3:
+                        system("ls"); // If no argument, just run ls
+                        break;
+                    }
                 }
             }
             break;
@@ -58,7 +84,8 @@ int main(void)
                     else
                     {
                         // Update the prompt to reflect the new directory
-                        snprintf(bg_stat, sizeof(bg_stat), "fbash/%s/> ", token_second);
+                        char directory = system("pwd");
+                        snprintf(bg_stat, sizeof(bg_stat), "fbash/%s/> ", directory);
                     }
                 }
                 else
